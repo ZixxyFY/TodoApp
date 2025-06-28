@@ -8,19 +8,22 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class TodoRepository(private val dao: TodoDao) {
+class TodoRepository(
+    private val dao: TodoDao,
+    private val enableCloudSync: Boolean = true // default true for app, false for tests
+) {
     fun getAllTodos(): Flow<List<TodoItem>> = dao.getAllTodos()
     suspend fun insertTodo(todo: TodoItem) {
         dao.insertTodo(todo)
-        syncToFirestore()
+        if (enableCloudSync) syncToFirestore()
     }
     suspend fun updateTodo(todo: TodoItem) {
         dao.updateTodo(todo)
-        syncToFirestore()
+        if (enableCloudSync) syncToFirestore()
     }
     suspend fun deleteTodo(todo: TodoItem) {
         dao.deleteTodo(todo)
-        syncToFirestore()
+        if (enableCloudSync) syncToFirestore()
     }
 
     private suspend fun syncToFirestore() {
